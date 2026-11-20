@@ -1,0 +1,13 @@
+services:
+  pg-mcp:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - pg-mcp-postgres
+    environment:
+      # Runtime replaces this with the URI of the PostgreSQL service below.
+      # MCP_AUTH_TOKEN comes from the Dockerfile. Fill it on the deploy screen.
+      DATABASE_URI: postgresql://USER:PASSWORD@pg-mcp-postgres:5432/defaultdb
+  pg-mcp-postgres:
+    image: postgres:17

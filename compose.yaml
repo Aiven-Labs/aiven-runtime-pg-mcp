@@ -1,0 +1,26 @@
+services:
+  pg-mcp:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      DATABASE_URI: postgresql://mcp_user:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/defaultdb
+      MCP_AUTH_TOKEN: ${MCP_AUTH_TOKEN:?Set MCP_AUTH_TOKEN in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: mcp_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: defaultdb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mcp_user -d defaultdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+volumes:
+  postgres-data:
